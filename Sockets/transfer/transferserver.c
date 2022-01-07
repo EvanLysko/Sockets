@@ -57,6 +57,7 @@ int main(int argc, char * argv[]) {
 
     fp = fopen("recieved.txt", "w");
 
+    int bytes;
     int bytes_recv;
 
     //get filelen
@@ -68,12 +69,17 @@ int main(int argc, char * argv[]) {
         buffer = (char *) malloc(sizeof(char) * (filelen + 1));
     }
 
+    bytes_recv = -4;
     //getfile
-    if (bytes_recv = read(newsockfd, buffer, sizeof(buffer)) < 0) {
-        error("Error recieving file");
+    while ( bytes_recv < filelen) {//write until error or bytes_sent == filelen
+        bytes = read(newsockfd, buffer + bytes_recv, sizeof(buffer));
+        bytes_recv += bytes;
+        printf("%d out of %d bytes recv\n", bytes_recv, filelen);
     }
-    
-    else {
+    if (bytes < 0) {//if error closed loop
+        error("Error receiving file");
+    }
+    else {//reached filelen
         printf("%s\n", buffer);
         fwrite(buffer, 1, bytes_recv, fp);//write buffer to file
         printf("%d bytes recv\nThe file has been recieved successfully\n", bytes_recv);

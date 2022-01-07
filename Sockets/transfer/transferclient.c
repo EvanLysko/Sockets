@@ -83,6 +83,7 @@ int main(int argc, char * argv[]) {
         }
     }
     
+    int bytes;
     int bytes_sent;
     //send the size
     if (bytes_sent = write(sockfd, &filelen , sizeof(filelen)) > -1) {
@@ -91,13 +92,20 @@ int main(int argc, char * argv[]) {
     else {
         error("Error transfering length\n");
     }
+    bytes_sent = 0;
     //send the file
-    if (bytes_sent = write(sockfd, buffer, filelen) > -1) {
-        printf("%d bytes sent\nfile has been succesfully transfered\n", bytes_sent);
+     while( bytes_sent < filelen) {//write until error or bytes_sent == filelen
+        bytes = write(sockfd, buffer, filelen);
+        bytes_sent += bytes;
+        printf("%d  out ot %ld bytes sent\n", bytes_sent, filelen);
     }
-    else {
+    if (bytes < 0) {//if error closed loop
         error("Error transfering file\n");
     }
+    else {//reached filelen
+    printf("Sent Full File\n");
+    }
+
     fclose(f);
     free(buffer);
     close(sockfd);
